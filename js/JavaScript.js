@@ -388,6 +388,27 @@ function short_Links(link, tokenLink) {
         })
 }
 
+function pidkey(key, version) {
+    $.post("/check_pidkey", { key: key, version: version})
+        .done(function (ketqua) {
+            $("#result_key").val(ketqua);
+            $("#btnPIDKEY").html('GET');
+            $("#key").removeAttr('disabled');
+            $("#optionPIDKEY").removeAttr('disabled');
+            $("#btnPIDKEY").removeAttr('disabled');
+            showAlert('success', "Check key success.");
+            clearInterval(interval);
+        })
+        .fail(function () {
+            $("#btnPIDKEY").html('GET');
+            $("#key").removeAttr('disabled');
+            $("#optionPIDKEY").removeAttr('disabled');
+            $("#btnPIDKEY").removeAttr('disabled');
+            showAlert('danger', "Sorry, cannot connect server.");
+            clearInterval(interval);
+        })
+}
+
 $(document).ready(function () {
     $(".domain").html(window.location.protocol + '//' + window.location.hostname);
     $("#history_view").hide();
@@ -750,6 +771,34 @@ $(document).ready(function () {
         } else {
             copyTextToClipboard(keygiaima);
             showAlert('success', "Copy success.");
+        }
+    });
+
+    $('#btnPIDKEY').click(function () {
+        $("#result_key").val('');
+        var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
+        $("#btnPIDKEY").html(button);
+        $("#key").attr('disabled', true);
+        $("#optionPIDKEY").attr('disabled', true);
+        $("#btnPIDKEY").attr('disabled', true);
+        var key = $("#key").val();
+        var optionPIDKEY = $("#optionPIDKEY :selected").val();
+        if (key.length === 0) {
+            alert("Sorry, Key cannot be empty.");
+            $("#btnPIDKEY").html('GET');
+            $("#key").removeAttr('disabled');
+            $("#optionPIDKEY").removeAttr('disabled');
+            $("#btnPIDKEY").removeAttr('disabled');
+        } else if (optionPIDKEY === "") {
+            alert("Sorry, version key is not correct.");
+            $("#btnPIDKEY").html('GET');
+            $("#key").removeAttr('disabled');
+            $("#optionPIDKEY").removeAttr('disabled');
+            $("#btnPIDKEY").removeAttr('disabled');
+        }
+        else {
+            clock();
+            pidkey(key, optionPIDKEY);
         }
     });
 })
