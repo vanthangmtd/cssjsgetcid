@@ -265,10 +265,10 @@ function showAlert(messageAlert, messageText) {
     });
 };
 
-function register_api_token(email, token_type) {
+function register_api_token(email, countApi) {
     $.post("/register-api-token", {
         email: email,
-        token_type: token_type,
+        countApi: countApi,
         grecaptcha: grecaptcha.getResponse()
     })
         .done(function (ketqua) {
@@ -276,7 +276,7 @@ function register_api_token(email, token_type) {
             showAlert('success', "Registry successful.");
             alert(ketqua);
             $("#email").removeAttr('disabled');
-            $("#optionRegistry").removeAttr('disabled');
+            $("#countapi").removeAttr('disabled');
             $("#register_api_token").removeAttr('disabled');
             $("#donate").removeAttr('disabled');
             clearInterval(interval);
@@ -287,7 +287,7 @@ function register_api_token(email, token_type) {
             showAlert('danger', "Unable to connect to the server, please try again later!");
             alert("Unable to connect to the server, please try again later!");
             $("#email").removeAttr('disabled');
-            $("#optionRegistry").removeAttr('disabled');
+            $("#countapi").removeAttr('disabled');
             $("#register_api_token").removeAttr('disabled');
             $("#donate").removeAttr('disabled');
             clearInterval(interval);
@@ -409,6 +409,42 @@ function pidkey(key, version) {
         })
 }
 
+(function () {
+    /**
+     * Tinh chỉ số thập phân của một con số.
+     *
+     * @param {String}  type  Loại điều chỉnh.
+     * @param {Number}  value Số liệu.
+     * @param {Integer} exp   Số mũ (the 10 logarithm of the adjustment base).
+     * @returns {Number} Giá trị đã chỉnh sửa.
+     */
+    function decimalAdjust(type, value, exp) {
+        // Nếu exp có giá trị undefined hoặc bằng không thì...
+        if (typeof exp === 'undefined' || +exp === 0) {
+            return Math[type](value);
+        }
+        value = +value;
+        exp = +exp;
+        // Nếu value không phải là ố hoặc exp không phải là số nguyên thì...
+        if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+            return NaN;
+        }
+        // Shift
+        value = value.toString().split('e');
+        value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+        // Shift back
+        value = value.toString().split('e');
+        return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+    }
+
+    // Làm tròn số thập phân (ra xa giá trị 0)
+    if (!Math.ceil10) {
+        Math.ceil10 = function (value, exp) {
+            return decimalAdjust('ceil', value, exp);
+        };
+    }
+})();
+
 $(document).ready(function () {
     $(".domain").html(window.location.protocol + '//' + window.location.hostname);
     $("#history_view").hide();
@@ -432,41 +468,24 @@ $(document).ready(function () {
     });
 
     $("#btnGETCID").click(function () {
-        var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
-        $("#btnGETCID").html(button);
-        cleandata();
-        $('#CID').val("Loadding...")
-        $('#CID-').val("Loadding...")
-        $("#tbxIID").attr('disabled', true);
-        $("#btnGETCID").attr('disabled', true);
-        $("#copyResult").attr('disabled', true);
-        $("#copyResult-").attr('disabled', true);
-        $("#optionVersion").attr('disabled', true);
-        $("#copyCMD").attr('disabled', true);
         var iid = validateIID($("#tbxIID").val());
         var lengStr = iid.length;
         if ((lengStr === 54) || (lengStr === 63) && grecaptcha.getResponse().length != 0) {
+            var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
+            $("#btnGETCID").html(button);
+            cleandata();
+            $('#CID').val("Loadding...")
+            $("#tbxIID").attr('disabled', true);
+            $("#btnGETCID").attr('disabled', true);
+            $("#copyResult").attr('disabled', true);
+            $("#copyResult-").attr('disabled', true);
+            $("#optionVersion").attr('disabled', true);
+            $("#copyCMD").attr('disabled', true);
             clock()
             getcid(iid);
         } else if (grecaptcha.getResponse().length === 0) {
-            $("#btnGETCID").html('GET');
-            $('#CID').val("Sorry, cannot get confirmation id.");
-            $("#tbxIID").removeAttr('disabled');
-            $("#btnGETCID").removeAttr('disabled');
-            $("#copyResult").removeAttr('disabled');
-            $("#copyResult-").removeAttr('disabled');
-            $("#optionVersion").removeAttr('disabled');
-            $("#copyCMD").removeAttr('disabled');
             showAlert('warning', "Sorry, cannot get confirmation id.");
         } else {
-            $("#btnGETCID").html('GET');
-            $('#CID').val("Wrong IID.");
-            $("#tbxIID").removeAttr('disabled');
-            $("#btnGETCID").removeAttr('disabled');
-            $("#copyResult").removeAttr('disabled');
-            $("#copyResult-").removeAttr('disabled');
-            $("#optionVersion").removeAttr('disabled');
-            $("#copyCMD").removeAttr('disabled');
             showAlert('warning', "Wrong IID.");
         }
     });
@@ -508,54 +527,29 @@ $(document).ready(function () {
     });
 
     $("#register_api_token").click(function () {
-        var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
-        $("#register_api_token").html(button);
-        $("#email").attr('disabled', true);
-        $("#optionRegistry").attr('disabled', true);
-        $("#register_api_token").attr('disabled', true);
-        $("#donate").attr('disabled', true);
         var email = $("#email").val();
-        var optRegistry = $("#optionRegistry :selected").val();
-        var registry;
+        var countapi = $("#countapi").val();
         if (ValidateEmail(email) === false) {
-            $("#register_api_token").html('Submit');
             showAlert('warning', "You have entered an invalid email address!");
             alert("You have entered an invalid email address!");
-            $("#email").removeAttr('disabled');
-            $("#optionRegistry").removeAttr('disabled');
-            $("#register_api_token").removeAttr('disabled');
-            $("#donate").removeAttr('disabled');
         } else if (grecaptcha.getResponse().length === 0) {
-            $("#register_api_token").html('Submit');
             showAlert('warning', "Sorry, we could not generate api token.");
             alert("Sorry, we could not generate api token.");
-            $("#email").removeAttr('disabled');
-            $("#optionRegistry").removeAttr('disabled');
-            $("#register_api_token").removeAttr('disabled');
-            $("#donate").removeAttr('disabled');
+        } else if (countapi < 1) {
+            showAlert('warning', "Please enter the number of api times greater than 0.");
+            alert("Please enter the number of api times greater than 0.");
         }
         else {
-            if (optRegistry === "Select registry") {
-                $("#register_api_token").html('Submit');
-                showAlert('warning', "Please get select registry.");
-                alert("Please get select registry.");
-                $("#email").removeAttr('disabled');
-                $("#optionRegistry").removeAttr('disabled');
-                $("#register_api_token").removeAttr('disabled');
-                $("#donate").removeAttr('disabled');
-            } else {
-                registry = optRegistry.toLowerCase();
-                var r = confirm("Do you want registry?");
-                if (r == true) {
-                    clock();
-                    register_api_token(email, registry);
-                } else {
-                    $("#register_api_token").html('Submit');
-                    $("#email").removeAttr('disabled');
-                    $("#optionRegistry").removeAttr('disabled');
-                    $("#register_api_token").removeAttr('disabled');
-                    $("#donate").removeAttr('disabled');
-                }
+            var r = confirm("Do you want registry?");
+            if (r == true) {
+                var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
+                $("#register_api_token").html(button);
+                $("#email").attr('disabled', true);
+                $("#countapi").attr('disabled', true);
+                $("#register_api_token").attr('disabled', true);
+                $("#donate").attr('disabled', true);
+                clock();
+                register_api_token(email, countapi);
             }
         }
     });
@@ -619,11 +613,6 @@ $(document).ready(function () {
 
     $("#Getquicklink").click(function () {
         cleandata();
-        $("#link").attr('disabled', true);
-        $("#linkcustom").attr('disabled', true);
-        $("#Getquicklink").attr('disabled', true);
-        $("#linkquick").attr('disabled', true);
-        $("#copylinkquick").attr('disabled', true);
         var link = $("#link").val();
         var tokenLink = validateTokenLink($("#linkcustom").val());
         if (link.length != 0) {
@@ -632,46 +621,25 @@ $(document).ready(function () {
                     .done(function (ketqua) {
                         var checklinkcustom = ketqua;
                         if (checklinkcustom === "true") {
-                            $("#link").removeAttr('disabled');
-                            $("#linkcustom").removeAttr('disabled');
-                            $("#Getquicklink").removeAttr('disabled');
-                            $("#linkquick").removeAttr('disabled');
-                            $("#copylinkquick").removeAttr('disabled');
                             showAlert('warning', "Sorry, quick link already exists.");
                         } else if (checklinkcustom === "false") {
                             var r = confirm("Your quick link is: https://getcid.info/tolink/" + tokenLink + "\nDo you want quick link ? ");
                             if (r == true) {
                                 if (grecaptcha.getResponse().length === 0) {
-                                    $("#link").removeAttr('disabled');
-                                    $("#linkcustom").removeAttr('disabled');
-                                    $("#Getquicklink").removeAttr('disabled');
-                                    $("#linkquick").removeAttr('disabled');
-                                    $("#copylinkquick").removeAttr('disabled');
                                     showAlert('warning', "Sorry, cannot get quick links.");
                                 } else if (link.length != 0 && grecaptcha.getResponse().length != 0) {
+                                    $("#link").attr('disabled', true);
+                                    $("#linkcustom").attr('disabled', true);
+                                    $("#Getquicklink").attr('disabled', true);
+                                    $("#linkquick").attr('disabled', true);
+                                    $("#copylinkquick").attr('disabled', true);
                                     clock()
                                     short_Links(link, tokenLink);
                                 } else {
-                                    $("#link").removeAttr('disabled');
-                                    $("#linkcustom").removeAttr('disabled');
-                                    $("#Getquicklink").removeAttr('disabled');
-                                    $("#linkquick").removeAttr('disabled');
-                                    $("#copylinkquick").removeAttr('disabled');
                                     showAlert('warning', "Sorry, cannot get quick links.");
                                 }
-                            } else {
-                                $("#link").removeAttr('disabled');
-                                $("#linkcustom").removeAttr('disabled');
-                                $("#Getquicklink").removeAttr('disabled');
-                                $("#linkquick").removeAttr('disabled');
-                                $("#copylinkquick").removeAttr('disabled');
                             }
                         } else {
-                            $("#link").removeAttr('disabled');
-                            $("#linkcustom").removeAttr('disabled');
-                            $("#Getquicklink").removeAttr('disabled');
-                            $("#linkquick").removeAttr('disabled');
-                            $("#copylinkquick").removeAttr('disabled');
                             showAlert('warning', checklinkcustom);
                         }
                     })
@@ -688,11 +656,6 @@ $(document).ready(function () {
                 short_Links(link, tokenLink);
             }
         } else {
-            $("#link").removeAttr('disabled');
-            $("#linkcustom").removeAttr('disabled');
-            $("#Getquicklink").removeAttr('disabled');
-            $("#linkquick").removeAttr('disabled');
-            $("#copylinkquick").removeAttr('disabled');
             showAlert('warning', "Sorry, the link cannot be empty.");
         }
     });
@@ -776,29 +739,49 @@ $(document).ready(function () {
 
     $('#btnPIDKEY').click(function () {
         $("#result_key").val('');
-        var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
-        $("#btnPIDKEY").html(button);
-        $("#key").attr('disabled', true);
-        $("#optionPIDKEY").attr('disabled', true);
-        $("#btnPIDKEY").attr('disabled', true);
+        
         var key = $("#key").val();
         var optionPIDKEY = $("#optionPIDKEY :selected").val();
         if (key.length === 0) {
             alert("Sorry, Key cannot be empty.");
-            $("#btnPIDKEY").html('GET');
-            $("#key").removeAttr('disabled');
-            $("#optionPIDKEY").removeAttr('disabled');
-            $("#btnPIDKEY").removeAttr('disabled');
         } else if (optionPIDKEY === "") {
             alert("Sorry, version key is not correct.");
-            $("#btnPIDKEY").html('GET');
-            $("#key").removeAttr('disabled');
-            $("#optionPIDKEY").removeAttr('disabled');
-            $("#btnPIDKEY").removeAttr('disabled');
         }
         else {
+            var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
+            $("#btnPIDKEY").html(button);
+            $("#key").attr('disabled', true);
+            $("#optionPIDKEY").attr('disabled', true);
+            $("#btnPIDKEY").attr('disabled', true);
             clock();
             pidkey(key, optionPIDKEY);
+        }
+    });
+
+    $("#countapi").keyup(function () {
+        var count = $("#countapi").val();
+        if (count <= 5) {
+            $("#vnd").val("0 VND");
+            $("#usd").val("$0");
+        } else {
+            $("#vnd").val(count * 250 + "VND");
+            var tiendobandau = (count * 250) / 22000;
+            var phipaypal = tiendobandau * 0.4 / 100;
+            var thanhtien = Math.ceil10(tiendobandau + phipaypal + 3.03, -2);
+            $("#usd").val("$" + (thanhtien));
+        }
+    });
+    $("#countapi").change(function () {
+        var count = $("#countapi").val();
+        if (count <= 5) {
+            $("#vnd").val("0 VND");
+            $("#usd").val("$0");
+        } else {
+            $("#vnd").val(count * 250 + "VND");
+            var tiendobandau = (count * 250) / 22000;
+            var phipaypal = tiendobandau * 0.4 / 100;
+            var thanhtien = Math.ceil10(tiendobandau + phipaypal + 3.03, -2);
+            $("#usd").val("$" + (thanhtien));
         }
     });
 })
