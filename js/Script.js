@@ -445,6 +445,83 @@ function pidkey(key, version) {
     }
 })();
 
+function createAcc(dataCreateAcc, token) {
+    $.post("/acc365/createAcc", {
+        infoUser: dataCreateAcc,
+        token: token
+    })
+        .done(function (ketqua) {
+            $('#datatable').DataTable({
+                destroy: true,
+                data: ketqua,
+                columns: [
+                    { 'data': 'id' },
+                    { 'data': 'email' },
+                    { 'data': 'password' },
+                    { 'data': 'results' }
+                ]
+            });
+            clearInterval(interval);
+            $("#createAcc365").removeAttr('disabled');
+            showAlert('success', "Create account office 365 successful.");
+            $("#downloadAreateAcc").show();
+            cleanandenableItemInfoAcc()
+            $("#createAcc365").html('Submit');
+        })
+        .fail(function () {
+            $("#createAcc365").removeAttr('disabled');
+            clearInterval(interval);
+            showAlert('danger', "Unable to connect to the server, please try again later!");
+            cleanandenableItemInfoAcc()
+            $("#createAcc365").html('Submit');
+        })
+}
+
+function disableItemInfoAcc() {
+    $("#fName").attr('disabled', true);
+    $("#lName").attr('disabled', true);
+    $("#userName").attr('disabled', true);
+    $("#mail").attr('disabled', true);
+}
+
+function enableItemInfoAcc() {
+    $("#fName").removeAttr('disabled');
+    $("#lName").removeAttr('disabled');
+    $("#userName").removeAttr('disabled');
+    $("#mail").removeAttr('disabled');
+    $("#dvCSV").html('');
+}
+
+function cleanandenableItemInfoAcc() {
+    $("#file").val('');
+    $("#fName").val('');
+    $("#lName").val('');
+    $("#userName").val('');
+    $("#mail").val('');
+    $("#file").removeAttr('disabled');
+    enableItemInfoAcc();
+}
+
+function disableItemRegistry365() {
+    $("#email").attr('disabled', true);
+    $("#tenant_id").attr('disabled', true);
+    $("#client_ID").attr('disabled', true);
+    $("#client_secrets").attr('disabled', true);
+    $("#domain_name").attr('disabled', true);
+    $("#optionRegistry").attr('disabled', true);
+    $("#registry365").attr('disabled', true);
+}
+
+function enableItemRegistry365() {
+    $("#email").removeAttr('disabled');
+    $("#tenant_id").removeAttr('disabled');
+    $("#client_ID").removeAttr('disabled');
+    $("#client_secrets").removeAttr('disabled');
+    $("#domain_name").removeAttr('disabled');
+    $("#optionRegistry").removeAttr('disabled');
+    $("#registry365").removeAttr('disabled');
+}
+
 $(document).ready(function () {
     $(".domain").html(window.location.protocol + '//' + window.location.hostname);
     $("#history_view").hide();
@@ -783,5 +860,230 @@ $(document).ready(function () {
             var thanhtien = Math.ceil10(tiendobandau + phipaypal + 3.03, -2);
             $("#usd").val("$" + (thanhtien));
         }
+    });
+
+    $('#createAcc365').click(function () {
+        var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
+        $("#createAcc365").html(button);
+        var fname = $("#fName").val();
+        var lname = $("#lName").val();
+        var username = $("#userName").val();
+        var mail = $("#mail").val();
+        var dataCSV = $("#dvCSV").html();
+        var data = '';
+        var dataCreateAcc = '';
+        var token = $("#codes").val();
+        if (token === '') {
+            alert("Please verify before creating an account.");
+            $("#createAcc365").removeAttr('disabled');
+            $("#createAcc365").html('Submit');
+        } else {
+            if (dataCSV === '') {
+                if (fName === '') {
+                    data = ''
+                    alert("Please provide First Name, Last Name.");
+                    $("#createAcc365").html('Submit');
+                } else if (lname === '') {
+                    data = ''
+                    alert("Please provide First Name, Last Name.");
+                    $("#createAcc365").html('Submit');
+                } else if (username === '') {
+                    data = ''
+                    alert("Please provide a Username.");
+                    $("#createAcc365").html('Submit');
+                } else if (mail === '') {
+                    data = ''
+                    alert("Please provide a Email.");
+                    $("#createAcc365").html('Submit');
+                } else {
+                    var item = new Object();
+                    item.fname = fname;
+                    item.lname = lname;
+                    item.username = username;
+                    item.email = mail;
+                    data = "[" + JSON.stringify(item) + "]";
+                }
+            } else {
+                dataCreateAcc = dataCSV;
+            }
+            if (data != '') {
+                dataCreateAcc = data;
+            } else {
+                dataCreateAcc = dataCSV;
+            }
+            if (dataCreateAcc === '') {
+                alert("Please provide account creation information.");
+                $("#createAcc365").html('Submit');
+            } else {
+                $("#createAcc365").attr('disabled', true);
+                $("#dvCSV").html('');
+                clock();
+                createAcc(dataCreateAcc, token)
+            }
+        }
+    });
+
+    $("#downloadAreateAcc365").click(function () {
+        var data = '';
+        $.each($('#datatable').DataTable().rows().data().toArray(), function () {
+            $.each(this, function (name, value) {
+                data = data + name + ': ' + value + ', '
+            });
+            data = data + '\n';
+        });
+        var blob = new Blob([data], { type: "application/json;utf-8" });
+        var userLink = document.createElement('a');
+        userLink.setAttribute('download', 'List data acc.txt');
+        userLink.setAttribute('href', window.URL.createObjectURL(blob));
+        userLink.click();
+    });
+
+    $("#file").change(function () {
+        disableItemInfoAcc();
+        var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv|.txt)$/;
+        if (regex.test($("#file").val().toLowerCase())) {
+            if (typeof (FileReader) != "undefined") {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var datajson = new Array();
+                    var rows = e.target.result.split("\r\n");
+                    for (var i = 0; i < rows.length; i++) {
+                        var cells = rows[i].split(",");
+                        if (cells.length > 1) {
+                            var datacsv = {};
+                            datacsv.fname = cells[0];
+                            datacsv.lname = cells[1];
+                            datacsv.username = cells[2];
+                            datacsv.email = cells[3];
+                            datajson.push(datacsv);
+                        }
+                    }
+                    $("#dvCSV").hide();
+                    $("#dvCSV").html('');
+                    $("#dvCSV").append(JSON.stringify(datajson));
+                }
+                reader.readAsText($("#file")[0].files[0]);
+            } else {
+                alert("This browser does not support HTML5.");
+                enableItemInfoAcc();
+            }
+        } else {
+            alert("Please upload a valid CSV file.");
+            enableItemInfoAcc();
+        }
+    });
+    $("#fName").change(function () {
+        if ($("#fName").val() != '' || $("#lName").val() != '' || $("#userName").val() != '' || $("#mail").val() != '')
+            $("#file").attr('disabled', true);
+        else
+            $("#file").removeAttr('disabled');
+    });
+    $("#lName").change(function () {
+        if ($("#fName").val() != '' || $("#lName").val() != '' || $("#userName").val() != '' || $("#mail").val() != '')
+            $("#file").attr('disabled', true);
+        else
+            $("#file").removeAttr('disabled');
+    });
+    $("#userName").change(function () {
+        if ($("#fName").val() != '' || $("#lName").val() != '' || $("#userName").val() != '' || $("#mail").val() != '')
+            $("#file").attr('disabled', true);
+        else
+            $("#file").removeAttr('disabled');
+    });
+
+    $("#registry365").click(function () {
+        var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
+        $("#registry365").html(button);
+        var item = new Object();
+        item.email = $("#email").val();
+        item.tenant_id = $("#tenant_id").val();
+        item.client_id = $("#client_id").val();
+        item.client_secrets = $("#client_secrets").val();;
+        item.domain_name = $("#domain_name").val();
+        item.optionRegistry = $("#optionRegistry :selected").val();
+        if (item.email === '') {
+            grecaptcha.reset();
+            alert("Please provide Email.");
+            $("#registry365").html('Submit');
+        } else if (item.tenant_id === '') {
+            grecaptcha.reset();
+            alert("Please provide Tenant ID.");
+            $("#registry365").html('Submit');
+        } else if (item.client_ID === '') {
+            grecaptcha.reset();
+            alert("Please provide Client ID.");
+            $("#registry365").html('Submit');
+        } else if (item.client_secrets === '') {
+            grecaptcha.reset();
+            alert("Please provide Client secrets code.");
+            $("#registry365").html('Submit');
+        } else if (item.domain_name === '') {
+            grecaptcha.reset();
+            alert("Please provide Domain name.");
+            $("#registry365").html('Submit');
+        } else if (item.optionRegistry === 'Select registry') {
+            grecaptcha.reset();
+            alert("Please select a subscription package.");
+            $("#registry365").html('Submit');
+        } else if (grecaptcha.getResponse().length === 0) {
+            grecaptcha.reset();
+            alert("Sorry, you must authenticate Recaptcha.");
+            $("#registry365").html('Submit');
+        }
+
+        if (item.email != '' && item.tenant_id != '' && item.client_id != '' && item.client_secrets != '' &&
+            item.domain_name != '' && item.optionRegistry != 'Select registry' && grecaptcha.getResponse().length != 0) {
+            var data = JSON.stringify(item);
+            disableItemRegistry365();
+            clock();
+            $.post("/acc365/registry", {
+                infoUser: data,
+                grecaptcha: grecaptcha.getResponse()
+            })
+                .done(function (ketqua) {
+                    clearInterval(interval);
+                    alert(ketqua);
+                    showAlert('success', ketqua);
+                    enableItemRegistry365();
+                    grecaptcha.reset();
+                    $("#registry365").html('Submit');
+                })
+                .fail(function () {
+                    clearInterval(interval);
+                    showAlert('danger', "Unable to connect to the server, please try again later!");
+                    enableItemRegistry365();
+                    grecaptcha.reset();
+                    $("#registry365").html('Submit');
+                })
+        }
+    });
+
+    $("#getVerificationKey365").click(function () {
+        var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
+        $("#getVerificationKey365").html(button);
+        $.post("/acc365/check", {
+            code: $("#verificationKey").val()
+        })
+            .done(function (ketqua) {
+                var obj = JSON.parse(ketqua);
+                $('#email').val(obj.email);
+                $('#key').val(obj.codes);
+                $('#typeKey').val(obj.typecodes);
+                $('#totalUsage').val(obj.totalget);
+                $('#totalUsed').val(obj.countget);
+                if (obj.email === "null") {
+                    $("#historycode").attr('disabled', true);
+                    $("#history").hide();
+                } else {
+                    $("#history").show();
+                    $("#historycode").removeAttr('disabled');
+                }
+                showAlert('success', "Verification key successful.");
+                $("#getVerificationKey365").html('Submit');
+            })
+            .fail(function () {
+                showAlert('danger', "Unable to connect to the server, please try again later!");
+                $("#getVerificationKey365").html('Submit');
+            })
     });
 })
