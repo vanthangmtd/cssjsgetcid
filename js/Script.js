@@ -747,8 +747,7 @@ $(document).ready(function () {
             showAlert('warning', "Key must not be empty.");
         } else {
             $.post("/encrypt", {
-                data: keymahoa,
-                grecaptcha: grecaptcha.getResponse()
+                data: keymahoa
             })
                 .done(function (ketqua) {
                     $("#codesMaHoa").val(ketqua);
@@ -772,13 +771,13 @@ $(document).ready(function () {
             showAlert('warning', "Encryption key must not be empty.");
         } else {
             $.post("/decrypt", {
-                codes: codesGiaiMa
+                codes: codesGiaiMa,
+                grecaptcha: grecaptcha.getResponse()
             })
                 .done(function (ketqua) {
                     $("#keygiaima").val(ketqua);
                     showAlert('success', "Decryption successful.");
                     var lengthKetqua = ketqua.length;
-                    console.log(lengthKetqua);
                     if (lengthKetqua != 0) {
                         $("#copyGiaiMa").show();
                         $("#copyGiaiMa").removeAttr('disabled');
