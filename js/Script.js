@@ -388,8 +388,8 @@ function short_Links(link, tokenLink) {
         })
 }
 
-function pidkey(key, version) {
-    $.post("/check-pidkey", { key: key, version: version })
+function pidkey(key, version, token) {
+    $.post("/check-pidkey", { key: key, version: version, token:token })
         .done(function (ketqua) {
             $("#result_key").val(ketqua);
             $("#btnPIDKEY").html('GET');
@@ -663,7 +663,6 @@ $(document).ready(function () {
         $.post("/history-api-token", {
             token: $("#apitoken_result").val()
         }).done(function (ketqua) {
-            console.log(ketqua);
             $('#datatable').DataTable({
                 destroy: true,
                 data: ketqua,
@@ -815,7 +814,7 @@ $(document).ready(function () {
 
     $('#btnPIDKEY').click(function () {
         $("#result_key").val('');
-        
+        var token = $("#tokenSyn").val();
         var key = $("#key").val();
         var optionPIDKEY = $("#optionPIDKEY :selected").val();
         if (key.length === 0) {
@@ -830,7 +829,7 @@ $(document).ready(function () {
             $("#optionPIDKEY").attr('disabled', true);
             $("#btnPIDKEY").attr('disabled', true);
             clock();
-            pidkey(key, optionPIDKEY);
+            pidkey(key, optionPIDKEY, token);
         }
     });
 
@@ -1084,5 +1083,45 @@ $(document).ready(function () {
                 showAlert('danger', "Unable to connect to the server, please try again later!");
                 $("#getVerificationKey365").html('Submit');
             })
+    });
+
+    $('#btnSynPid').click(function () {
+        var token = $("#tokenSyn").val();
+        var optionPIDKEY = $("#optionPIDKEY :selected").val();
+        if (token.length === 0) {
+            alert("Sorry, Token Synchronization cannot be empty.");
+        } else if (optionPIDKEY === "") {
+            alert("Sorry, version key is not correct.");
+        } else {
+            $.post("/get-list-syn-pidkey", {
+                token: token,
+                optionpidkey: optionPIDKEY,
+                grecaptcha: grecaptcha.getResponse()
+            })
+                .done(function (ketqua) {
+                    if (ketqua.status === 'done') {
+                        $('#datatable').DataTable({
+                            destroy: true,
+                            data: ketqua.res,
+                            columns: [
+                                { 'data': 'Id' },
+                                { 'data': 'Key' },
+                                { 'data': 'Description' },
+                                { 'data': 'SubType' },
+                                { 'data': 'LicenseType' },
+                                { 'data': 'Errorcode' },
+                                { 'data': 'MAKCount' }
+                            ]
+                        });
+                    } else {
+                        showAlert('danger', ketqua.res);
+                    }
+                    grecaptcha.reset();
+                })
+                .fail(function () {
+                    showAlert('danger', "Unable to connect to the server, please try again later!");
+                    grecaptcha.reset();
+                })
+        }
     });
 })
