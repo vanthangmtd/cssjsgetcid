@@ -388,26 +388,7 @@ function short_Links(link, tokenLink) {
         })
 }
 
-function pidkey(key, version, token) {
-    $.post("/check-pidkey", { key: key, version: version, token:token })
-        .done(function (ketqua) {
-            $("#result_key").val(ketqua);
-            $("#btnPIDKEY").html('GET');
-            $("#key").removeAttr('disabled');
-            $("#optionPIDKEY").removeAttr('disabled');
-            $("#btnPIDKEY").removeAttr('disabled');
-            showAlert('success', "Check key success.");
-            clearInterval(interval);
-        })
-        .fail(function () {
-            $("#btnPIDKEY").html('GET');
-            $("#key").removeAttr('disabled');
-            $("#optionPIDKEY").removeAttr('disabled');
-            $("#btnPIDKEY").removeAttr('disabled');
-            showAlert('danger', "Sorry, cannot connect server.");
-            clearInterval(interval);
-        })
-}
+
 
 (function () {
     /**
