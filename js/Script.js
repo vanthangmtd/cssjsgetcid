@@ -388,7 +388,26 @@ function short_Links(link, tokenLink) {
         })
 }
 
-
+function pidkey(key, version, token) {
+    $.post("/check-pidkey", { key: key, version: version, token: token, grecaptcha: grecaptcha.getResponse() })
+        .done(function (ketqua) {
+            $("#result_key").val(ketqua);
+            $("#btnPIDKEY").html('GET');
+            $("#key").removeAttr('disabled');
+            $("#optionPIDKEY").removeAttr('disabled');
+            $("#btnPIDKEY").removeAttr('disabled');
+            showAlert('success', "Check key success.");
+            clearInterval(interval);
+        })
+        .fail(function () {
+            $("#btnPIDKEY").html('GET');
+            $("#key").removeAttr('disabled');
+            $("#optionPIDKEY").removeAttr('disabled');
+            $("#btnPIDKEY").removeAttr('disabled');
+            showAlert('danger', "Sorry, cannot connect server.");
+            clearInterval(interval);
+        })
+}
 
 (function () {
     /**
@@ -510,6 +529,7 @@ $(document).ready(function () {
     $("#copyMaHoa").hide();
     $("#copyGiaiMa").hide();
     $("#dvCSV").hide();
+    $("#synPidkeyResult").hide();
     $("#dvCSV").html('');
     $("#downloadAreateAcc").hide();
     $("#history_api_token").attr('disabled', true);
@@ -803,6 +823,10 @@ $(document).ready(function () {
         } else if (optionPIDKEY === "") {
             alert("Sorry, version key is not correct.");
         }
+        else if (grecaptcha.getResponse().length === 0) {
+            showAlert('warning', "Sorry, you must authenticate Recaptcha.");
+            alert("Sorry, you must authenticate Recaptcha.");
+        }
         else {
             var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
             $("#btnPIDKEY").html(button);
@@ -1080,6 +1104,7 @@ $(document).ready(function () {
                 grecaptcha: grecaptcha.getResponse()
             })
                 .done(function (ketqua) {
+                    $("#synPidkeyResult").show();
                     if (ketqua.status === 'done') {
                         $('#datatable').DataTable({
                             destroy: true,
@@ -1095,11 +1120,13 @@ $(document).ready(function () {
                             ]
                         });
                     } else {
+                        $("#synPidkeyResult").hide();
                         showAlert('danger', ketqua.res);
                     }
                     grecaptcha.reset();
                 })
                 .fail(function () {
+                    $("#synPidkeyResult").hide();
                     showAlert('danger', "Unable to connect to the server, please try again later!");
                     grecaptcha.reset();
                 })
