@@ -398,6 +398,7 @@ function pidkey(key, version, token) {
             $("#btnPIDKEY").removeAttr('disabled');
             showAlert('success', "Check key success.");
             clearInterval(interval);
+            grecaptcha.reset();
         })
         .fail(function () {
             $("#btnPIDKEY").html('GET');
@@ -406,6 +407,7 @@ function pidkey(key, version, token) {
             $("#btnPIDKEY").removeAttr('disabled');
             showAlert('danger', "Sorry, cannot connect server.");
             clearInterval(interval);
+            grecaptcha.reset();
         })
 }
 
