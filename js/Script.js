@@ -35,8 +35,15 @@ function ValidateEmail(inputText) {
 }
 
 function getcid(iid) {
-    $.post("/getcid", { iid: iid, grecaptcha: grecaptcha.getResponse() })
-        .done(function (ketqua) {
+    $.post({
+        url: "/getcid",
+        data: { 'iid': iid },
+        headers: {
+            'grecaptcha': grecaptcha.getResponse(),
+            'authenToken': content
+        }
+    })
+        .done(function (ketqua, status, xhr) {
             var data = JSON.parse(ketqua);
             cid = data.cid;
             if (cid.length === 48) {
@@ -78,6 +85,7 @@ function getcid(iid) {
             $("#copyCMD").removeAttr('disabled');
             clearInterval(interval);
             grecaptcha.reset();
+            content = xhr.getResponseHeader("authenToken");
         })
         .fail(function () {
             cleandata();
@@ -398,7 +406,6 @@ function pidkey(key, version, token) {
             $("#btnPIDKEY").removeAttr('disabled');
             showAlert('success', "Check key success.");
             clearInterval(interval);
-            grecaptcha.reset();
         })
         .fail(function () {
             $("#btnPIDKEY").html('GET');
@@ -407,7 +414,6 @@ function pidkey(key, version, token) {
             $("#btnPIDKEY").removeAttr('disabled');
             showAlert('danger', "Sorry, cannot connect server.");
             clearInterval(interval);
-            grecaptcha.reset();
         })
 }
 
@@ -756,11 +762,9 @@ $(document).ready(function () {
                     showAlert('success', "Encryption successful.");
                     $("#copyMaHoa").show();
                     $("#copyMaHoa").removeAttr('disabled');
-                    grecaptcha.reset();
                 })
                 .fail(function () {
                     showAlert('danger', "Unable to connect to the server, please try again later!");
-                    grecaptcha.reset();
                 })
         }
     });
@@ -787,10 +791,12 @@ $(document).ready(function () {
                         $("#copyGiaiMa").hide();
                         $("#copyGiaiMa").attr('disabled', true);
                     }
+                    grecaptcha.reset();
                 })
                 .fail(function () {
                     showAlert('danger', "Unable to connect to the server, please try again later!");
                     $("#codesGiaiMa").val("");
+                    grecaptcha.reset();
                 })
         }
     });
