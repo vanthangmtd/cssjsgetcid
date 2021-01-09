@@ -71,7 +71,12 @@ function getcid(iid) {
                 $('#CID').val(cid);
                 cleandata();
                 showAlert('danger', cid);
-            } else {
+            }else if(ketqua === "Blocked IID."){
+                $('#CID').val("Key block.");
+                cleandata();
+                showAlert('success', "Get confirmation id success.");
+            }
+             else {
                 $('#CID').val(cid);
                 cleandata();
                 showAlert('success', "Get confirmation id success.");
