@@ -537,6 +537,15 @@ function enableItemRegistry365() {
     $("#registry365").removeAttr('disabled');
 }
 
+var recaptchaCallback = function () {
+    $.post({
+        url: "/recaptcha",
+        headers: {
+            'grecaptcha': grecaptcha.getResponse()
+        }
+    });
+};
+
 $(document).ready(function () {
     $(".domain").html(window.location.protocol + '//' + window.location.hostname);
     $("#history_view").hide();
