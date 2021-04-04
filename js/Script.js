@@ -573,7 +573,7 @@ $(document).ready(function () {
         var iid = validateIID($("#tbxIID").val());
         var lengStr = iid.length;
         if ((lengStr === 54) || (lengStr === 63) && grecaptcha.getResponse().length != 0) {
-            var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
+             /*var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
             $("#btnGETCID").html(button);
             cleandata();
             $('#CID').val("Loadding...")
@@ -584,7 +584,10 @@ $(document).ready(function () {
             $("#optionVersion").attr('disabled', true);
             $("#copyCMD").attr('disabled', true);
             clock()
-            getcid(iid);
+            getcid(iid);*/
+			showAlert('danger', "Sorry, the website is currently maintaining getcid, please visit it later.");
+            clearInterval(interval);
+            grecaptcha.reset();
         } else if (grecaptcha.getResponse().length === 0) {
             showAlert('warning', "Sorry, cannot get confirmation id.");
         } else {
