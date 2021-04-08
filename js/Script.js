@@ -541,7 +541,8 @@ var recaptchaCallback = function () {
     $.post({
         url: "/recaptcha",
         headers: {
-            'grecaptcha': grecaptcha.getResponse()
+            'grecaptcha': grecaptcha.getResponse(),
+            'content': content
         }
     });
 };
