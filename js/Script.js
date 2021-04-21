@@ -774,30 +774,8 @@ $(document).ready(function () {
 
     $("#copylinkquick").click(function () { copylink() });
 
-    $("#maHoa").click(function () {
-        $("#codesMaHoa").val("");
-        var keymahoa = $("#keymahoa").val();
-        var lengStr = keymahoa.length;
-        if (lengStr === 0) {
-            showAlert('warning', "Key must not be empty.");
-        } else {
-            $.post("/encrypt", {
-                data: keymahoa
-            })
-                .done(function (ketqua) {
-                    $("#codesMaHoa").val(ketqua);
-                    showAlert('success', "Encryption successful.");
-                    $("#copyMaHoa").show();
-                    $("#copyMaHoa").removeAttr('disabled');
-                })
-                .fail(function () {
-                    showAlert('danger', "Unable to connect to the server, please try again later!");
-                })
-        }
-    });
-
     $("#giaiMa").click(function () {
-        $("#keygiaima").val("");
+        $("#dataEncode").html('');
         var codesGiaiMa = $("#codesGiaiMa").val();
         var lengStr = codesGiaiMa.length;
         if (lengStr === 0) {
@@ -808,20 +786,25 @@ $(document).ready(function () {
                 grecaptcha: grecaptcha.getResponse()
             })
                 .done(function (ketqua) {
-                    $("#keygiaima").val(ketqua);
-                    showAlert('success', "Decryption successful.");
-                    var lengthKetqua = ketqua.length;
-                    if (lengthKetqua != 0) {
-                        $("#copyGiaiMa").show();
-                        $("#copyGiaiMa").removeAttr('disabled');
-                    } else {
-                        $("#copyGiaiMa").hide();
-                        $("#copyGiaiMa").attr('disabled', true);
+                    if (ketqua == 'Invalid key code.' || ketqua == 'Server too busy.' || ketqua == 'Sorry, you must authenticate Recaptcha.' ||
+                        ketqua == 'Sorry, cannot decryption.') {
+                        grecaptcha.reset();
+                        alert(ketqua);
+                        //showAlert('warning', ketqua);
                     }
-                    grecaptcha.reset();
+                    else {
+                        //showAlert('success', "Decryption successful.");
+                        $("#dataEncode").html('');
+                        var html = '<iframe src="/show-decrypt/' + ketqua + '"';
+                        html = html + 'style="height: 1000px; width:100%; border:none" title="Iframe Example"></iframe>';
+                        $("#dataEncode").html(html);
+                        grecaptcha.reset();
+                        alert("Decryption successful.");
+                    }
                 })
                 .fail(function () {
-                    showAlert('danger', "Unable to connect to the server, please try again later!");
+                    alert("Unable to connect to the server, please try again later!");
+                    //showAlert('danger', "Unable to connect to the server, please try again later!");
                     $("#codesGiaiMa").val("");
                     grecaptcha.reset();
                 })
