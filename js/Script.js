@@ -292,6 +292,8 @@ function register_api_token(email, countApi) {
     $.post("/register-api-token", {
         email: email,
         countApi: countApi,
+        statusDonate: "chuathanhtoan",
+        usd: "0",
         grecaptcha: grecaptcha.getResponse()
     })
         .done(function (ketqua) {
@@ -301,17 +303,20 @@ function register_api_token(email, countApi) {
             $("#email").removeAttr('disabled');
             $("#countapi").removeAttr('disabled');
             $("#register_api_token").removeAttr('disabled');
+            $("#payment_register_api_token").removeAttr('disabled');
             $("#donate").removeAttr('disabled');
             clearInterval(interval);
             grecaptcha.reset();
         })
         .fail(function () {
             $("#register_api_token").html('Submit');
+            $("#payment_register_api_token").html('Confirm payment paypal');
             showAlert('danger', "Unable to connect to the server, please try again later!");
             alert("Unable to connect to the server, please try again later!");
             $("#email").removeAttr('disabled');
             $("#countapi").removeAttr('disabled');
             $("#register_api_token").removeAttr('disabled');
+            $("#payment_register_api_token").removeAttr('disabled');
             $("#donate").removeAttr('disabled');
             clearInterval(interval);
             grecaptcha.reset();
@@ -657,9 +662,11 @@ $(document).ready(function () {
             if (r == true) {
                 var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
                 $("#register_api_token").html(button);
+                $("#payment_register_api_token").html(button);
                 $("#email").attr('disabled', true);
                 $("#countapi").attr('disabled', true);
                 $("#register_api_token").attr('disabled', true);
+                $("#payment_register_api_token").attr('disabled', true);
                 $("#donate").attr('disabled', true);
                 clock();
                 register_api_token(email, countapi);
