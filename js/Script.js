@@ -298,6 +298,7 @@ function register_api_token(email, countApi) {
     })
         .done(function (ketqua) {
             $("#register_api_token").html('Submit');
+            $("#payment_register_api_token").html('Confirm payment paypal');
             showAlert('success', "Registry successful.");
             alert(ketqua);
             $("#email").removeAttr('disabled');
