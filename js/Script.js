@@ -77,11 +77,11 @@ function getcid(iid) {
                 $("#blockH").val(CID8);
                 $("#lenhCMD").val("");
                 showAlert('success', "Get confirmation id success.");
-            } else if (ketqua === "Server too busy.") {
+            } else if (cid === "Server too busy.") {
                 $('#CID').val("Sorry, the website is currently maintaining getcid, please visit it later.");
                 cleandata();
                 showAlert('danger', cid);
-            }else if(ketqua === "Blocked IID."){
+            }else if(cid == "Blocked IID."){
                 $('#CID').val("Key block.");
                 cleandata();
                 showAlert('success', "Get confirmation id success.");
