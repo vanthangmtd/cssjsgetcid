@@ -82,7 +82,7 @@ function getcid(iid) {
                 cleandata();
                 showAlert('danger', cid);
             }else if(cid == "Blocked IID."){
-                $('#CID').val("Key block.");
+                $('#CID').val("Key blocked.");
                 cleandata();
                 showAlert('success', "Get confirmation id success.");
             }
