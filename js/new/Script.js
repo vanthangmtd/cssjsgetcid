@@ -292,8 +292,6 @@ function register_api_token(email, countApi) {
     $.post("/register-api-token", {
         email: email,
         countApi: countApi,
-        statusDonate: "chuathanhtoan",
-        usd: "0",
         grecaptcha: grecaptcha.getResponse()
     })
         .done(function (ketqua) {
