@@ -281,10 +281,10 @@ function copycmd() {
 }
 
 function showAlert(messageAlert, messageText) {
-    var alertBox = '<div class="alert alert-' + messageAlert + ' alert-dismissable" id="showalert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span class="word-break">' + messageText + '</span></div>';
+    var alertBox = '<div class="alert alert-' + messageAlert + ' alert-dismissable showalert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span class="word-break">' + messageText + '</span></div>';
     $('.messages').html(alertBox);
-    $("#showalert").fadeTo(5000, 500).slideUp(500, function () {
-        $("#showalert").slideUp(500);
+    $(".showalert").fadeTo(5000, 500).slideUp(500, function () {
+        $(".showalert").slideUp(500);
     });
 };
 
