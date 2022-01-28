@@ -1,4 +1,4 @@
-﻿var interval;
+var interval;
 var cid;
 function clock() {
     clearInterval(interval);
@@ -74,7 +74,7 @@ function getcid(iid) {
                 $("#blockF").val(CID6);
                 $("#blockG").val(CID7);
                 $("#blockH").val(CID8);
-                $("#lenhCMD").val("");
+                $("#lenhCMD").val('');
                 showAlert('success', "Get confirmation id success.");
             } else if (cid === "Server too busy.") {
                 $('#CID').val("Sorry, the website is currently maintaining getcid, please visit it later.");
@@ -365,16 +365,16 @@ function copyTextToClipboard(text) {
 }
 
 function cleandata() {
-    $("#blockA").val("");
-    $("#blockB").val("");
-    $("#blockC").val("");
-    $("#blockD").val("");
-    $("#blockE").val("");
-    $("#blockF").val("");
-    $("#blockG").val("");
-    $("#blockH").val("");
-    $("#lenhCMD").val("");
-    $("#linkquick").val("");
+    $("#blockA").val('');
+    $("#blockB").val('');
+    $("#blockC").val('');
+    $("#blockD").val('');
+    $("#blockE").val('');
+    $("#blockF").val('');
+    $("#blockG").val('');
+    $("#blockH").val('');
+    $("#lenhCMD").val('');
+    $("#linkquick").val('');
 }
 
 function tokenlink(length) {
@@ -395,7 +395,7 @@ function short_Links(link, tokenLink) {
             else
                 $("#linkquick").val(ketqua);
             $("#linkcustom").val(tokenlink(5));
-            $("#link").val("");
+            $("#link").val('');
             $("#link").removeAttr('disabled');
             $("#linkcustom").removeAttr('disabled');
             $("#Getquicklink").removeAttr('disabled');
@@ -506,7 +506,7 @@ $(document).ready(function () {
         var lengStr = iid.length;
         if ((lengStr === 54) || (lengStr === 63)) {
         } else {
-            $('#tbxIID').val("");
+            $('#tbxIID').val('');
         }
     });
 
