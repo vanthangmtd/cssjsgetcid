@@ -477,16 +477,6 @@ function pidkey(key, version, token) {
     }
 })();
 
-var recaptchaCallback = function () {
-    $.post({
-        url: "/recaptcha",
-        headers: {
-            'grecaptcha': grecaptcha.getResponse(),
-            'content': content
-        }
-    });
-};
-
 $(document).ready(function () {
     $(".domain").html(window.location.protocol + '//' + window.location.hostname);
     $("#history_view").hide();
