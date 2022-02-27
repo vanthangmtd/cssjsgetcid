@@ -1,4 +1,4 @@
-﻿function ValidateKey(key) {
+function ValidateKey(key) {
     if (key.length == 0)
         return false;
     var regexKey = new RegExp("^[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}$");
@@ -10,20 +10,33 @@ function findKey(listKey) {
     for (const value of listKey) {
         var result = KeyIdentification(value);
         if (result.length > 0) {
-            if (arrTemp.length == 0)
-                arrTemp.push(result[0]);
-            else if (arrTemp.includes(result[0]) == false)
-                arrTemp.push(result[0]);
+            var i = 0;
+            for (i = 0; i <= result.length - 1; i++) {
+                if (arrTemp.length == 0)
+                    arrTemp.push(result[i]);
+                else if (arrTemp.includes(result[i]) == false)
+                    arrTemp.push(result[i]);
+            }
         }
     }
     return arrTemp;
 }
 
 function KeyIdentification(key) {
-    var regexKey = new RegExp("[A-Za-z0-9]{5}-[A-Za-z0-9]{5}-[A-Za-z0-9]{5}-[A-Za-z0-9]{5}-[A-Za-z0-9]{5}");
-    var result = regexKey.exec(key)
-    if (result != null && ValidateKey(result)) {
-        return result;
+    var arrTemp = new Array();
+    var resultMatch = new Array();
+    var regexKey = /[A-Za-z0-9]{5}-[A-Za-z0-9]{5}-[A-Za-z0-9]{5}-[A-Za-z0-9]{5}-[A-Za-z0-9]{5}/gi;
+    var resultMatch = key.match(regexKey);
+    if (resultMatch != null) {
+        var i = 0;
+        for (i = 0; i <= resultMatch.length - 1; i++) {
+            if (ValidateKey(resultMatch[i]))
+                arrTemp.push(resultMatch[i]);
+        }
+        if (arrTemp.length > 0)
+            return arrTemp;
+        else
+            return new Array();
     }
     else
         return new Array();
