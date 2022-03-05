@@ -322,15 +322,6 @@ function register_api_token(email, countApi) {
         })
 }
 
-function copylink() {
-    var link = $("#linkquick").val();
-    if (link.length === 0) {
-        showAlert('warning', "Please quick link.");
-    } else {
-        copyTextToClipboard(link);
-    }
-}
-
 function fallbackCopyTextToClipboard(text) {
     var textArea = document.createElement("textarea");
     textArea.value = text;
@@ -375,70 +366,6 @@ function cleandata() {
     $("#blockH").val('');
     $("#lenhCMD").val('');
     $("#linkquick").val('');
-}
-
-function tokenlink(length) {
-    var result = '';
-    var characters = 'abcdefghijklmnopqrstuvwxyz';
-    var charactersLength = characters.length;
-    for (var i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-}
-
-function short_Links(link, tokenLink) {
-    $.post("/short-links", { link: link, tokenLink: tokenLink, grecaptcha: grecaptcha.getResponse() })
-        .done(function (ketqua) {
-            if (ketqua.indexOf("tolink") > -1)
-                $("#linkquick").val(window.location.protocol + '//' + window.location.hostname + '/' + ketqua);
-            else
-                $("#linkquick").val(ketqua);
-            $("#linkcustom").val(tokenlink(5));
-            $("#link").val('');
-            $("#link").removeAttr('disabled');
-            $("#linkcustom").removeAttr('disabled');
-            $("#Getquicklink").removeAttr('disabled');
-            $("#linkquick").removeAttr('disabled');
-            $("#copylinkquick").removeAttr('disabled');
-            showAlert('success', "Quick link success.");
-            clearInterval(interval);
-            grecaptcha.reset();
-        })
-        .fail(function () {
-            $("#link").removeAttr('disabled');
-            $("#linkcustom").removeAttr('disabled');
-            $("#Getquicklink").removeAttr('disabled');
-            $("#linkquick").removeAttr('disabled');
-            $("#copylinkquick").removeAttr('disabled');
-            cleandata();
-            showAlert('danger', "Sorry, cannot get quick links.");
-            clearInterval(interval);
-            grecaptcha.reset();
-        })
-}
-
-function pidkey(key, version, token) {
-    $.post("/check-pidkey", { key: key, version: version, token: token, grecaptcha: grecaptcha.getResponse() })
-        .done(function (ketqua) {
-            $("#result_key").val(ketqua);
-            $("#btnPIDKEY").html('GET');
-            $("#key").removeAttr('disabled');
-            $("#optionPIDKEY").removeAttr('disabled');
-            $("#btnPIDKEY").removeAttr('disabled');
-            showAlert('success', "Check key success.");
-            grecaptcha.reset();
-            clearInterval(interval);
-        })
-        .fail(function () {
-            $("#btnPIDKEY").html('GET');
-            $("#key").removeAttr('disabled');
-            $("#optionPIDKEY").removeAttr('disabled');
-            $("#btnPIDKEY").removeAttr('disabled');
-            showAlert('danger', "Sorry, cannot connect server.");
-            grecaptcha.reset();
-            clearInterval(interval);
-        })
 }
 
 (function () {
@@ -644,64 +571,6 @@ $(document).ready(function () {
         $("#view_history_api_token").show();
     });
 
-    $("#linkcustom").val(tokenlink(5));
-
-    $("#linkcustom").on('keyup', function () {
-        var t = this.value.replace(/[^a-z]/gi, "").trim();
-        this.value = t;
-    });
-
-    $("#Getquicklink").click(function () {
-        cleandata();
-        var link = $("#link").val();
-        var tokenLink = validateTokenLink($("#linkcustom").val());
-        if (link.length != 0) {
-            if (tokenLink.length != 0) {
-                $.post("/verify-token-link-exist", { tokenLink: tokenLink })
-                    .done(function (ketqua) {
-                        var checklinkcustom = ketqua;
-                        if (checklinkcustom == "True") {
-                            showAlert('warning', "Sorry, quick link already exists.");
-                        } else if (checklinkcustom === "False") {
-                            var r = confirm("Your quick link is: https://getcid.info/tolink/" + tokenLink + "\nDo you want quick link ? ");
-                            if (r == true) {
-                                if (grecaptcha.getResponse().length === 0) {
-                                    showAlert('warning', "Sorry, cannot get quick links.");
-                                } else if (link.length != 0 && grecaptcha.getResponse().length != 0) {
-                                    $("#link").attr('disabled', true);
-                                    $("#linkcustom").attr('disabled', true);
-                                    $("#Getquicklink").attr('disabled', true);
-                                    $("#linkquick").attr('disabled', true);
-                                    $("#copylinkquick").attr('disabled', true);
-                                    clock()
-                                    short_Links(link, tokenLink);
-                                } else {
-                                    showAlert('warning', "Sorry, cannot get quick links.");
-                                }
-                            }
-                        } else {
-                            showAlert('warning', checklinkcustom);
-                        }
-                    })
-                    .fail(function () {
-                        $("#link").removeAttr('disabled');
-                        $("#linkcustom").removeAttr('disabled');
-                        $("#Getquicklink").removeAttr('disabled');
-                        $("#linkquick").removeAttr('disabled');
-                        $("#copylinkquick").removeAttr('disabled');
-                        showAlert('danger', "Unable to connect to the server, please try again later!");
-                    })
-            } else {
-                clock()
-                short_Links(link, tokenLink);
-            }
-        } else {
-            showAlert('warning', "Sorry, the link cannot be empty.");
-        }
-    });
-
-    $("#copylinkquick").click(function () { copylink() });
-
     $('#copyCodesMaHoa').click(function () {
         var codesMaHoa = $("#codesMaHoa").val();
         if (codesMaHoa.length === 0) {
@@ -719,31 +588,6 @@ $(document).ready(function () {
         } else {
             copyTextToClipboard(keygiaima);
             showAlert('success', "Copy success.");
-        }
-    });
-
-    $('#btnPIDKEY').click(function () {
-        $("#result_key").val('');
-        var token = $("#tokenSyn").val();
-        var key = $("#key").val();
-        var optionPIDKEY = $("#optionPIDKEY :selected").val();
-        if (key.length === 0) {
-            alert("Sorry, Key cannot be empty.");
-        } else if (optionPIDKEY === "") {
-            alert("Sorry, version key is not correct.");
-        }
-        else if (grecaptcha.getResponse().length === 0) {
-            showAlert('warning', "Sorry, you must authenticate Recaptcha.");
-            alert("Sorry, you must authenticate Recaptcha.");
-        }
-        else {
-            var button = '<i class="fa fa-spinner fa-pulse" style="font-size: 24px;"></i>';
-            $("#btnPIDKEY").html(button);
-            $("#key").attr('disabled', true);
-            $("#optionPIDKEY").attr('disabled', true);
-            $("#btnPIDKEY").attr('disabled', true);
-            clock();
-            pidkey(key, optionPIDKEY, token);
         }
     });
 
