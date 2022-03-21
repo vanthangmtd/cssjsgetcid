@@ -596,12 +596,17 @@ $(document).ready(function () {
         if (count <= 5) {
             $("#vnd").val("0 VND");
             $("#usd").val("$0");
+            $("#usdt").val("0 USDT");
         } else {
             $("#vnd").val(count * 250 + "VND");
             var tiendobandau = (count * 250) / 22000;
             var phipaypal = tiendobandau * 0.4 / 100;
             var thanhtien = Math.ceil10(tiendobandau + phipaypal + 3.03, -2);
             $("#usd").val("$" + (thanhtien));
+
+            var vnd = parseFloat(thanhtien) * 22100;
+            var usdt = Math.ceil10(vnd / 23400, -2);
+            $("#usdt").val(usdt + " USDT");
         }
     });
     $("#countapi").change(function () {
@@ -609,12 +614,17 @@ $(document).ready(function () {
         if (count <= 5) {
             $("#vnd").val("0 VND");
             $("#usd").val("$0");
+            $("#usdt").val("0 USDT");
         } else {
             $("#vnd").val(count * 250 + "VND");
             var tiendobandau = (count * 250) / 22000;
             var phipaypal = tiendobandau * 0.4 / 100;
             var thanhtien = Math.ceil10(tiendobandau + phipaypal + 3.03, -2);
             $("#usd").val("$" + (thanhtien));
+
+            var vnd = parseFloat(thanhtien) * 22100;
+            var usdt = Math.ceil10(vnd / 23400, -2);
+            $("#usdt").val(usdt + " USDT");
         }
     });
 
