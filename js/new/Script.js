@@ -622,8 +622,8 @@ $(document).ready(function () {
             var thanhtien = Math.ceil10(tiendobandau + phipaypal + 3.03, -2);
             $("#usd").val("$" + (thanhtien));
 
-            var vnd = parseFloat(thanhtien) * 22100;
-            var usdt = Math.ceil10(vnd / 23400, -2);
+            var vnd = parseFloat(thanhtien) * 22700;
+            var usdt = Math.ceil10(vnd / 23000, -2);
             $("#usdt").val(usdt + " USDT");
         }
     });
