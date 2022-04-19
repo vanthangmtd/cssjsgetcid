@@ -289,7 +289,7 @@ function showAlert(messageAlert, messageText) {
 };
 
 function register_api_token(email, countApi) {
-    $.post("/register-api-token", {
+    $.post("/register-api-token-getcid", {
         email: email,
         countApi: countApi,
         grecaptcha: grecaptcha.getResponse()
@@ -487,7 +487,7 @@ $(document).ready(function () {
     });
 
     $("#register_api_token").click(function () {
-        var email = $("#email").val();
+        var email = $("#email_register").val();
         var countapi = $("#countapi").val();
         if (ValidateEmail(email) === false) {
             showAlert('warning', "You have entered an invalid email address!");
@@ -517,7 +517,7 @@ $(document).ready(function () {
     });
 
     $("#verify_api_token").click(function () {
-        $.post("/verify-apitoken", {
+        $.post("/verify-api-token-getcid", {
             token: $("#apitoken").val()
         })
             .done(function (ketqua) {
@@ -551,7 +551,7 @@ $(document).ready(function () {
     });
 
     $("#history_api_token").click(function () {
-        $.post("/history-api-token", {
+        $.post("/history-api-token-getcid", {
             token: $("#apitoken_result").val()
         }).done(function (ketqua) {
             $('#datatable').DataTable({
@@ -622,52 +622,9 @@ $(document).ready(function () {
             var thanhtien = Math.ceil10(tiendobandau + phipaypal + 3.03, -2);
             $("#usd").val("$" + (thanhtien));
 
-            var vnd = parseFloat(thanhtien) * 22700;
-            var usdt = Math.ceil10(vnd / 23000, -2);
+            var vnd = parseFloat(thanhtien) * 22100;
+            var usdt = Math.ceil10(vnd / 23400, -2);
             $("#usdt").val(usdt + " USDT");
-        }
-    });
-
-    $('#btnSynPid').click(function () {
-        var token = $("#tokenSyn").val();
-        var optionPIDKEY = $("#optionPIDKEY :selected").val();
-        if (token.length === 0) {
-            alert("Sorry, Token Synchronization cannot be empty.");
-        } else if (optionPIDKEY === "") {
-            alert("Sorry, version key is not correct.");
-        } else {
-            $.post("/get-list-syn-pidkey", {
-                token: token,
-                optionpidkey: optionPIDKEY,
-                grecaptcha: grecaptcha.getResponse()
-            })
-                .done(function (ketqua) {
-                    $("#synPidkeyResult").show();
-                    if (ketqua.status === 'done') {
-                        $('#datatable').DataTable({
-                            destroy: true,
-                            data: ketqua.res,
-                            columns: [
-                                { 'data': 'id' },
-                                { 'data': 'datakey' },
-                                { 'data': 'description' },
-                                { 'data': 'subtype' },
-                                { 'data': 'licensetype' },
-                                { 'data': 'errorcode' },
-                                { 'data': 'makcount' }
-                            ]
-                        });
-                    } else {
-                        $("#synPidkeyResult").hide();
-                        showAlert('danger', ketqua.res);
-                    }
-                    grecaptcha.reset();
-                })
-                .fail(function () {
-                    $("#synPidkeyResult").hide();
-                    showAlert('danger', "Unable to connect to the server, please try again later!");
-                    grecaptcha.reset();
-                })
         }
     });
 })
