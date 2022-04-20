@@ -49,12 +49,12 @@ var initSampleEncode = ( function() {
 })();
 
 
-var initSampleDecode = (function () {
+var initSampleBlog = (function () {
 	var wysiwygareaAvailable = isWysiwygareaAvailable(),
 		isBBCodeBuiltIn = !!CKEDITOR.plugins.get('bbcode');
 
 	return function () {
-		var editorElement = CKEDITOR.document.getById('editorDecode');
+		var editorElement = CKEDITOR.document.getById('editorBlog');
 
 		// :(((
 		if (isBBCodeBuiltIn) {
@@ -63,10 +63,10 @@ var initSampleDecode = (function () {
 
 		// Depending on the wysiwygarea plugin availability initialize classic or inline editor.
 		if (wysiwygareaAvailable) {
-			CKEDITOR.replace('editorDecode');
+			CKEDITOR.replace('editorBlog');
 		} else {
 			editorElement.setAttribute('contenteditable', 'true');
-			CKEDITOR.inline('editorDecode');
+			CKEDITOR.inline('editorBlog');
 
 			// TODO we can consider displaying some info box that
 			// without wysiwygarea the classic editor may not work.
