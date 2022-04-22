@@ -627,4 +627,11 @@ $(document).ready(function () {
             $("#usdt").val(usdt + " USDT");
         }
     });
+    
+    $(".scroll-top").click(function () {
+        $("html, body").animate({
+            scrollTop: 0
+        }, "slow");
+        return false;
+    });
 })
