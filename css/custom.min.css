@@ -194,6 +194,7 @@ border-color: #ddd;
 	font-weight: bold;
 	line-height: normal;
 	border: none;
+	filter: alpha(opacity=100);
 }
 .scroll-top:hover{
 	background: #D7DBDD;
